@@ -6,88 +6,72 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // CONFIGURATION
-    const GEMINI_API_KEY = "AIzaSyAMQ3_alta4YudNBP-j8Rgsex5UOnzn2r4";
-    
-    // List of models to try in order of priority (Latest 2026 models first)
-    const MODELS_TO_TRY = [
-        "gemini-3.1-flash-preview", 
-        "gemini-2.5-flash", 
-        "gemini-2.5-pro", 
-        "gemini-1.5-flash", 
-        "gemini-pro"
-    ];
-    const VERSIONS_TO_TRY = ["v1beta", "v1"];
+    // API KEY IS NOW SECURED ON VERCEL!
+    const BACKEND_URL = "/api/chat"; 
 
     // This prompt "grounds" the AI with Venkatesh's career data
     const SYSTEM_PROMPT = `
         You are the personal AI Assistant for Venkatesh Bottupalli. 
-        Your goal is to answer questions about his career, projects, and skills professionally.
+        Your goal is to represent him as a high-potential, Senior-ready Full Stack Engineer.
         
         IDENTITY: 
         - Name: Venkatesh Bottupalli
         - Title: Full Stack Java Developer (2+ Years Experience)
         - Current Role: Java Full Stack Developer at Alladi Cloud Solutions (Feb 2023 - Present)
         
-        KEY PROJECTS:
+        STRENGTHS:
+        - Architectural Thinking: Designs scalable, high-concurrency systems (like his 1000+ request simulation engine).
+        - Product Ownership: Independently built "Hisaab Book" from database design to AWS deployment.
+        - Performance Optimization: Proven 30% improvement in backend response times.
+        - Clean Code: High focus on Java design patterns and modular frontend architecture (Angular).
+
+        WEAKNESSES (Handled Professionally):
+        - Perfectionism: Sometimes spends extra time perfecting the code architecture (learned to balance this with agile delivery).
+        - Direct Communication: Highly focused on the "why," which makes him a deep thinker but he is working on brevity in meetings.
+
+        EDUCATION & GOALS:
+        - Education: Dedicated learner with a continuous focus on modern Java (v17+) and Cloud architecture. 
+        - Career Goal: To become a lead software architect for globally scalable fintech or SaaS platforms.
+
+        CORE PROJECTS:
         1. Hisaab Book: Solo built a production SaaS ledger app for small businesses. Tech: Spring Boot, Angular, AWS EC2, CI/CD.
         2. ActNow: Student portal with practice tests and JWT security.
         3. LocalTaxi: Online cab booking with real-time dashboards and fare logic.
-        4. CloudBus: Transportation management system for drivers and bookings.
-        5. Simulation Engine: High-concurrency Java multi-threading project handling 1000+ requests.
 
-        TECHNICAL SKILLS:
+        TECHNICAL TOOLKIT:
         - Java (8, 11, 17), Spring Boot, Hibernate, JPA, REST APIs, Microservices.
         - Angular, AngularJS, TypeScript, JavaScript, HTML5, CSS3.
         - AWS (EC2, RDS), CI/CD, Maven, Git, Docker.
-        - Database: MySQL, PostgreSQL.
-
-        ACCOLADES:
-        - Improved API speed by 30%.
-        - Increased user engagement by 40%.
-        - Reduced deployment time by 25%.
 
         INSTRUCTIONS:
-        - Be professional, technical, and enthusiastic.
-        - If someone asks for contact info: venkateshbottupalli960@gmail.com, linkedin.com/in/venkatesh-bottupalli-79692a253
-        - If they ask something unrelated to Venkatesh, politely redirect them to his professional work.
+        - When asked about weaknesses, explain them as "growth areas" that he is actively mastering.
+        - When providing contact info, always maintain a friendly, professional tone.
+        - EMAIL: venkateshbottupalli960@gmail.com
+        - LINKEDIN: linkedin.com/in/venkatesh-bottupalli-79692a253
     `;
 
-    // --- 2. THE DYNAMIC AI ENGINE (With Fallbacks) ---
+    // --- 2. THE SECURE AI ENGINE ---
     async function askGemini(userInput) {
-        let lastError = "";
+        const fullPrompt = `${SYSTEM_PROMPT}\n\nUser Question: ${userInput}`;
 
-        for (const version of VERSIONS_TO_TRY) {
-            for (const model of MODELS_TO_TRY) {
-                const url = `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-                
-                try {
-                    console.log(`Trying model: ${model} on version: ${version}...`);
-                    const response = await fetch(url, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\nUser Question: ${userInput}` }] }]
-                        })
-                    });
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: fullPrompt })
+            });
 
-                    const data = await response.json();
-                    
-                    if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
-                        console.log(`Success with: ${model}`);
-                        return data.candidates[0].content.parts[0].text;
-                    } else if (response.status !== 404) {
-                        // If it's not a 404, it might be a real error (like 429 quota or 400 bad request)
-                        lastError = data.error?.message || "Error from Google";
-                        break; // Exit model loop for this version
-                    }
-                } catch (error) {
-                    console.error(`Failed ${model}:`, error);
-                    lastError = error.message;
-                }
+            const data = await response.json();
+            
+            if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                return "My AI brain is waking up on the server. Please try again in a few seconds!";
             }
+        } catch (error) {
+            console.error("Netlify AI Error:", error);
+            return "Connection error. Please contact Venkatesh directly!";
         }
-        
-        return `I'm currently adjusting my neural pathways! (Last Error: ${lastError}). Please contact Venkatesh directly at venkateshbottupalli960@gmail.com if this persists.`;
     }
 
     // --- 3. UI LOGIC (Chat & Interactions) ---
