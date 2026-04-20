@@ -1,5 +1,4 @@
-const fetch = require('node-fetch');
-
+// Using built-in fetch (available in Node 18+)
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
