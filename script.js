@@ -50,30 +50,35 @@ document.addEventListener('DOMContentLoaded', () => {
         - LINKEDIN: linkedin.com/in/venkatesh-bottupalli-79692a253
     `;
 
-    // --- 2. THE SECURE AI ENGINE ---
+    // --- 2. THE DYNAMIC AI ENGINE ---
     async function askGemini(userInput) {
         const fullPrompt = `${SYSTEM_PROMPT}\n\nUser Question: ${userInput}`;
 
-        try {
-            const response = await fetch(BACKEND_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: fullPrompt })
-            });
+        for (const version of VERSIONS_TO_TRY) {
+            for (const model of MODELS_TO_TRY) {
+                const url = `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+                
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: fullPrompt }] }]
+                        })
+                    });
 
-            const data = await response.json();
-            
-            if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
-                return data.candidates[0].content.parts[0].text;
-            } else {
-                // Return the specific error from Gemini or Vercel
-                const errorMsg = data.error?.message || data.error || "Unknown Error";
-                return `AI Issue: ${errorMsg}. Please ensure your API Key is set correctly in Vercel settings under GEMINI_API_KEY.`;
+                    const data = await response.json();
+                    
+                    if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
+                        return data.candidates[0].content.parts[0].text;
+                    }
+                } catch (error) {
+                    console.error(`Failed ${model}:`, error);
+                }
             }
-        } catch (error) {
-            console.error("Netlify AI Error:", error);
-            return "Connection error. Please contact Venkatesh directly!";
         }
+        
+        return "I'm having a slight connection issue. Please contact Venkatesh directly!";
     }
 
     // --- 3. UI LOGIC (Chat & Interactions) ---
