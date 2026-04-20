@@ -1,10 +1,10 @@
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Handle both parsed and raw bodies
+  // HARDCODED KEY (Ensure your repo is PRIVATE so this doesn't get leaked!)
+  const apiKey = "AIzaSyDeYcDoCASZlQ_DgMB9d2cWxITFg4ukIhw";
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   const message = body?.message;
-  const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) return res.status(500).json({ error: 'API Key missing in Vercel settings.' });
   if (!message) return res.status(400).json({ error: 'No message provided.' });
