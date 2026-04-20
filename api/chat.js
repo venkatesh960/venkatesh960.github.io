@@ -18,8 +18,17 @@ module.exports = async (req, res) => {
     });
 
     const data = await response.json();
+    
+    // If Google returns an error, pass the error message back to the frontend
+    if (!response.ok) {
+      return res.status(response.status).json({ 
+        error: data.error?.message || 'Google API Error',
+        details: data
+      });
+    }
+
     return res.status(200).json(data);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: 'Server Error: ' + error.message });
   }
 };

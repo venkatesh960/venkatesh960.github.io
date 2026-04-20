@@ -66,7 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
                 return data.candidates[0].content.parts[0].text;
             } else {
-                return "My AI brain is waking up on the server. Please try again in a few seconds!";
+                // Return the specific error from Gemini or Vercel
+                const errorMsg = data.error?.message || data.error || "Unknown Error";
+                return `AI Issue: ${errorMsg}. Please ensure your API Key is set correctly in Vercel settings under GEMINI_API_KEY.`;
             }
         } catch (error) {
             console.error("Netlify AI Error:", error);
