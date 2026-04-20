@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
   const MODELS = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
   const VERSIONS = ['v1beta', 'v1'];
 
-  let lastGoogleError = 'No response from Google';
+  let firstError = '';
 
   for (const version of VERSIONS) {
     for (const model of MODELS) {
@@ -32,13 +32,19 @@ module.exports = async (req, res) => {
         if (response.ok) {
           return res.status(200).json(data);
         } else {
-          lastGoogleError = data.error?.message || JSON.stringify(data);
+          // If it's an AUTH error (401/403/400), STOP and report it.
+          // Don't keep trying other models.
+          const msg = data.error?.message || "Unknown error";
+          if (response.status === 401 || response.status === 403 || msg.toLowerCase().includes("key")) {
+             return res.status(response.status).json({ error: `Google Auth Error: ${msg}` });
+          }
+          if (!firstError) firstError = msg;
         }
       } catch (err) {
-        lastGoogleError = err.message;
+        if (!firstError) firstError = err.message;
       }
     }
   }
 
-  return res.status(500).json({ error: `Google Rejected: ${lastGoogleError}` });
+  return res.status(500).json({ error: `Final Error: ${firstError}` });
 };
