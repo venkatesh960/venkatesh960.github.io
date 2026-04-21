@@ -227,11 +227,18 @@
     <div class="chat-fab" id="chatFab">🤖</div>
     <div class="chat-window glass" id="chatWindow">
         <div class="chat-header">
-            <span>Venkatesh-AI Assistant</span>
+            <div class="chat-header-meta">
+                <span class="chat-title">Venkatesh-AI Assistant</span>
+                <span class="chat-status">Online now • Portfolio intelligence</span>
+            </div>
             <button id="closeChat" style="background:none; border:none; color:#000; cursor:pointer; font-size:1.5rem;">&times;</button>
         </div>
         <div class="chat-body" id="chatBody">
-            <div class="message bot">Hi! I'm Real AI, grounded in Venkatesh's career data. Ask me anything about his projects or skills!</div>
+            <div class="message bot hero-message">
+                <span class="message-badge">AI</span>
+                <div class="message-content">Hi! I'm Venkatesh's portfolio assistant. Ask me about his experience, skills, projects, or contact details.</div>
+            </div>
+            <div class="chat-suggestions" id="chatSuggestions"></div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Ask a question...">
