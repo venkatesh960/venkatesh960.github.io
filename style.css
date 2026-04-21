@@ -141,6 +141,62 @@ header h1 {
   margin-bottom: 2rem;
 }
 
+/* Button System */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: var(--accent-color);
+  color: #000;
+  box-shadow: 0 10px 20px rgba(0, 242, 255, 0.15);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0, 242, 255, 0.25);
+}
+
+.btn-resume {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border: 1px solid var(--accent-color);
+  box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-resume:hover {
+  background: rgba(0, 242, 255, 0.1);
+  box-shadow: 0 0 25px rgba(0, 242, 255, 0.3);
+  transform: translateY(-3px);
+}
+
+.btn-resume::after {
+  content: "";
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  transition: 0.8s;
+  pointer-events: none;
+}
+
+.btn-resume:hover::after {
+  left: 100%;
+}
+
 /* Sections */
 section {
   padding: 120px 0;
@@ -355,8 +411,11 @@ section {
 
 .chat-window {
   position: fixed;
-  bottom: 6.5rem; right: 2rem;
-  width: 410px; height: 560px;
+  bottom: 2rem; /* Lowered from 6.5rem to keep it in view */
+  right: 2rem;
+  width: 410px; 
+  height: 600px;
+  max-height: calc(100vh - 4rem); /* Responsive limit: ensures it never goes off-screen */
   z-index: 2000;
   display: none;
   flex-direction: column;
@@ -392,6 +451,27 @@ section {
   font-size: 0.74rem;
   opacity: 0.7;
   font-weight: 700;
+}
+
+.chat-close-btn {
+  background: rgba(0, 0, 0, 0.15);
+  color: #001215; /* Dark contrast on cyan header */
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.chat-close-btn:hover {
+  background: rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
 }
 
 .chat-body {
